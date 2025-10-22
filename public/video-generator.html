@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Generator - AGM Imports Marketing Control Panel</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: #1e1e1e;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+
+        .control-panel-title {
+            color: #bb86fc;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: #2c2c2c;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: #bb86fc;
+            color: #000;
+        }
+
+        .nav-item .material-icons {
+            margin-right: 16px;
+            font-size: 24px;
+        }
+
+        .nav-item-text {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #b0b0b0;
+        }
+
+        .load-section {
+            background: #1e1e1e;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid #333;
+        }
+
+        .btn {
+            background-color: #bb86fc;
+            color: #000;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #9f6cde;
+        }
+
+        .btn:disabled {
+            background-color: #444;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .product-card {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid #333;
+        }
+
+        .product-image {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .product-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .product-details {
+            margin-bottom: 16px;
+            color: #b0b0b0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .video-prompt-section {
+            background: #2c2c2c;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .video-prompt-section label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #bb86fc;
+        }
+
+        .video-prompt-section textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #121212;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            resize: vertical;
+        }
+
+        .video-prompt-section textarea:focus {
+            outline: none;
+            border-color: #bb86fc;
+        }
+
+        .video-result {
+            background-color: #2c2c2c;
+            padding: 16px;
+            border-radius: 4px;
+            margin-top: 16px;
+            border-left: 4px solid #bb86fc;
+            display: none;
+        }
+
+        .loading {
+            color: #bb86fc;
+            font-style: italic;
+        }
+
+        .error {
+            color: #ff5252;
+            background-color: rgba(255, 82, 82, 0.1);
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 82, 82, 0.3);
+        }
+
+        #status {
+            margin-bottom: 16px;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+
+        .status-message.error {
+            background: rgba(255, 82, 82, 0.1);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            color: #ff5252;
+        }
+
+        .status-message.loading {
+            background: rgba(187, 134, 252, 0.1);
+            border: 1px solid rgba(187, 134, 252, 0.3);
+            color: #bb86fc;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 4px;
+            margin-top: 12px;
+        }
+
+        .video-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .video-settings select {
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #121212;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .video-settings select:focus {
+            outline: none;
+            border-color: #bb86fc;
+        }
+
+        .video-settings label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-container">
+            <img src="https://agmimports.com/wp-content/uploads/2020/12/AGM_Logo@2x.png" alt="AGM Imports" class="logo">
+            <div class="control-panel-title">Marketing Control Panel</div>
+        </div>
+        <nav class="nav-menu">
+            <a href="/dashboard.html" class="nav-item">
+                <span class="material-icons">dashboard</span>
+                <span class="nav-item-text">Dashboard</span>
+            </a>
+            <a href="/seo-generator.html" class="nav-item">
+                <span class="material-icons">description</span>
+                <span class="nav-item-text">SEO Generator</span>
+            </a>
+            <a href="/video-generator.html" class="nav-item active">
+                <span class="material-icons">videocam</span>
+                <span class="nav-item-text">Video Generator</span>
+            </a>
+            <a class="nav-item disabled" style="pointer-events: none; opacity: 0.5;">
+                <span class="material-icons">settings</span>
+                <span class="nav-item-text">Tool 3</span>
+            </a>
+            <a href="/credentials.html" class="nav-item">
+                <span class="material-icons">vpn_key</span>
+                <span class="nav-item-text">Credentials</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>AI Video Generator</h1>
+            <p>Generate marketing videos from new arrival stone product images using Google Veo 3</p>
+        </div>
+
+        <div class="load-section">
+            <button onclick="loadProducts()" class="btn" id="loadBtn">Load New Arrivals</button>
+        </div>
+
+        <div id="status"></div>
+        <div id="products" class="products-grid"></div>
+    </div>
+
+    <script>
+        let products = [];
+        let veoApiKey = '';
+
+        window.addEventListener('load', function() {
+            veoApiKey = localStorage.getItem('veo3_api_key') || '';
+        });
+
+        async function loadProducts() {
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.disabled = true;
+            loadBtn.textContent = 'Loading...';
+
+            try {
+                showStatus('Scraping new arrivals from AGM Imports...', 'loading');
+                const response = await fetch('/api/scrape-new-arrivals');
+                const data = await response.json();
+
+                if (data.success) {
+                    products = data.products;
+                    displayProducts(products);
+                    showStatus(`Loaded ${products.length} products successfully!`, 'success');
+                } else {
+                    showStatus(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error loading products: ${error.message}`, 'error');
+            } finally {
+                loadBtn.disabled = false;
+                loadBtn.textContent = 'Load New Arrivals';
+            }
+        }
+
+        function displayProducts(products) {
+            const productsContainer = document.getElementById('products');
+            productsContainer.innerHTML = '';
+
+            products.forEach(product => {
+                const prompts = getDefaultPrompts(product);
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.imageUrl}" alt="${product.title}" class="product-image">
+                    <div class="product-title">${product.title}</div>
+                    <div class="product-details">
+                        <strong>Material:</strong> ${product.material}<br>
+                        <strong>Color:</strong> ${product.color}<br>
+                        <strong>Lot Number:</strong> ${product.lotNumber}
+                    </div>
+                    <div class="video-prompt-section">
+                        <label>Video Prompt 1 - Pan</label>
+                        <textarea id="prompt-pan-${product.id}" placeholder="Horizontal pan prompt">${prompts.pan}</textarea>
+
+                        <label style="margin-top: 12px;">Video Prompt 2 - Flyby</label>
+                        <textarea id="prompt-zoom-${product.id}" placeholder="Drone flyby prompt">${prompts.zoom}</textarea>
+
+                        <div class="video-settings">
+                            <div>
+                                <label>Aspect Ratio</label>
+                                <select id="aspect-${product.id}">
+                                    <option value="16:9">16:9 (Landscape)</option>
+                                    <option value="9:16">9:16 (Portrait)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Resolution</label>
+                                <select id="resolution-${product.id}">
+                                    <option value="720p">720p</option>
+                                    <option value="1080p">1080p</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="generateAllVideos(${product.id})" class="btn" id="btn-${product.id}">
+                        Generate 2 Videos & Stitch
+                    </button>
+                    <div id="video-${product.id}" class="video-result"></div>
+                `;
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        function getDefaultPrompts(product) {
+            return {
+                pan: `A smooth cinematic pan across this ${product.material} stone surface, moving horizontally from left to right. The camera glides steadily across the stone, revealing intricate veining patterns and luxurious natural tones. Professional studio lighting highlights the stone's depth and texture. No photographer, videographer, camera equipment, reflections, or people visible in the shot.`,
+                zoom: `A dramatic drone flyby shot of this ${product.material} stone surface. The camera sweeps across the stone from a dynamic angle, flying over the surface like a cinematic aerial shot. Capture the sweeping movement and scale of the stone, showcasing its veining patterns and luxurious finish with a sense of motion and grandeur. Professional studio lighting with cinematic depth. No photographer, videographer, camera equipment, reflections, or people visible in the shot.`
+            };
+        }
+
+        async function generateAllVideos(productId) {
+            const product = products.find(p => p.id === productId);
+            const button = document.getElementById(`btn-${productId}`);
+            const videoContainer = document.getElementById(`video-${productId}`);
+
+            const panPrompt = document.getElementById(`prompt-pan-${productId}`).value;
+            const zoomPrompt = document.getElementById(`prompt-zoom-${productId}`).value;
+            const aspectRatio = document.getElementById(`aspect-${productId}`).value;
+            const resolution = document.getElementById(`resolution-${productId}`).value;
+
+            if (!veoApiKey) {
+                videoContainer.style.display = 'block';
+                videoContainer.innerHTML = '<div class="error">Please configure your Veo 3 API key in <a href="/credentials.html" style="color: #bb86fc;">Credentials</a></div>';
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Generating 2 Videos...';
+            videoContainer.style.display = 'block';
+            videoContainer.innerHTML = '<div class="loading">Generating 2 videos with Google Veo 3... This may take several minutes.</div>';
+
+            const videos = [];
+            const prompts = [
+                { name: 'Pan', prompt: panPrompt },
+                { name: 'Flyby', prompt: zoomPrompt }
+            ];
+
+            try {
+                for (let i = 0; i < prompts.length; i++) {
+                    videoContainer.innerHTML = `<div class="loading">Generating video ${i + 1} of 2 (${prompts[i].name})... This may take 11 seconds to 6 minutes.</div>`;
+
+                    const response = await fetch('/api/generate-video', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            apiKey: veoApiKey,
+                            product: product,
+                            prompt: prompts[i].prompt,
+                            aspectRatio: aspectRatio,
+                            resolution: resolution
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        videos.push({ name: prompts[i].name, url: data.videoUrl });
+                    } else {
+                        throw new Error(`Failed to generate ${prompts[i].name} video: ${data.error}`);
+                    }
+                }
+
+                videoContainer.innerHTML = '<div class="loading">Concatenating videos into single clip...</div>';
+
+                const concatResponse = await fetch('/api/concatenate-videos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        videos: videos
+                    })
+                });
+
+                const concatData = await concatResponse.json();
+
+                let videosHtml = '';
+
+                if (concatData.success) {
+                    videosHtml += `
+                        <div style="margin-bottom: 24px;">
+                            <strong style="color: #bb86fc; font-size: 18px;">🎬 Final Stitched Video (24 seconds - Pan → Flyby → Pan Reversed):</strong>
+                            <video controls style="margin-top: 12px; border: 2px solid #bb86fc; border-radius: 8px;">
+                                <source src="${concatData.videoUrl}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                }
+
+                videosHtml += '<strong style="color: #bb86fc;">Individual Clips:</strong>';
+                videos.forEach(video => {
+                    videosHtml += `
+                        <div style="margin-top: 16px;">
+                            <strong style="color: #bb86fc;">${video.name} Shot:</strong>
+                            <video controls style="margin-top: 8px;">
+                                <source src="${video.url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                });
+                videosHtml += '<p style="font-size: 12px; color: #888; margin-top: 12px;">Note: Videos will be available for 2 days</p>';
+
+                videoContainer.innerHTML = videosHtml;
+            } catch (error) {
+                videoContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate 2 Videos & Stitch';
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

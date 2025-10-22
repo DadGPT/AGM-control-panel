@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGM Imports Marketing Control Panel</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: #1e1e1e;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+
+        .control-panel-title {
+            color: #bb86fc;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: #2c2c2c;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: #bb86fc;
+            color: #000;
+        }
+
+        .nav-item .material-icons {
+            margin-right: 16px;
+            font-size: 24px;
+        }
+
+        .nav-item-text {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        .header {
+            margin-bottom: 48px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #b0b0b0;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .tool-card {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(187, 134, 252, 0.3);
+            border-color: #bb86fc;
+        }
+
+        .tool-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .tool-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border-color: transparent;
+        }
+
+        .tool-icon {
+            width: 64px;
+            height: 64px;
+            background: #bb86fc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .tool-icon .material-icons {
+            font-size: 32px;
+            color: #000;
+        }
+
+        .tool-card.disabled .tool-icon {
+            background: #333;
+        }
+
+        .tool-card.disabled .tool-icon .material-icons {
+            color: #666;
+        }
+
+        .tool-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .tool-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #b0b0b0;
+        }
+
+        .coming-soon {
+            display: inline-block;
+            background: #333;
+            color: #999;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-container">
+            <img src="https://agmimports.com/wp-content/uploads/2020/12/AGM_Logo@2x.png" alt="AGM Imports" class="logo">
+            <div class="control-panel-title">Marketing Control Panel</div>
+        </div>
+        <nav class="nav-menu">
+            <a href="/dashboard.html" class="nav-item active">
+                <span class="material-icons">dashboard</span>
+                <span class="nav-item-text">Dashboard</span>
+            </a>
+            <a href="/seo-generator.html" class="nav-item">
+                <span class="material-icons">description</span>
+                <span class="nav-item-text">SEO Generator</span>
+            </a>
+            <a href="/video-generator.html" class="nav-item">
+                <span class="material-icons">videocam</span>
+                <span class="nav-item-text">Video Generator</span>
+            </a>
+            <a class="nav-item disabled" style="pointer-events: none;">
+                <span class="material-icons">settings</span>
+                <span class="nav-item-text">Tool 3</span>
+            </a>
+            <a href="/credentials.html" class="nav-item">
+                <span class="material-icons">vpn_key</span>
+                <span class="nav-item-text">Credentials</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Welcome to AGM Imports Marketing Control Panel</h1>
+            <p>Manage your marketing tools and content generation from one centralized hub</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card" onclick="window.location.href='/seo-generator.html'">
+                <div class="tool-icon">
+                    <span class="material-icons">description</span>
+                </div>
+                <h2 class="tool-title">SEO Generator</h2>
+                <p class="tool-description">
+                    Generate keyword-rich, on-brand SEO descriptions for new arrival stone products.
+                    Analyzes product images using AI to create compelling, optimized content for your inventory.
+                </p>
+            </div>
+
+            <div class="tool-card" onclick="window.location.href='/video-generator.html'">
+                <div class="tool-icon">
+                    <span class="material-icons">videocam</span>
+                </div>
+                <h2 class="tool-title">Video Generator</h2>
+                <p class="tool-description">
+                    Generate AI-powered marketing videos from product images using Google Veo 3.
+                    Create stunning 8-second videos with native audio for social media and marketing campaigns.
+                </p>
+            </div>
+
+            <div class="tool-card disabled">
+                <div class="tool-icon">
+                    <span class="material-icons">settings</span>
+                </div>
+                <h2 class="tool-title">Marketing Tool 3</h2>
+                <p class="tool-description">
+                    Analytics and reporting dashboard for tracking marketing performance.
+                    Monitor engagement, conversions, and ROI across all your campaigns.
+                </p>
+                <span class="coming-soon">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Generator - AGM Imports Marketing Control Panel</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: #1e1e1e;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+
+        .control-panel-title {
+            color: #bb86fc;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: #2c2c2c;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: #bb86fc;
+            color: #000;
+        }
+
+        .nav-item .material-icons {
+            margin-right: 16px;
+            font-size: 24px;
+        }
+
+        .nav-item-text {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #b0b0b0;
+        }
+
+        .api-key-section {
+            background: #1e1e1e;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid #333;
+        }
+
+        .api-key-section h3 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #bb86fc;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            background: #2c2c2c;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: #bb86fc;
+        }
+
+        .btn {
+            background-color: #bb86fc;
+            color: #000;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #9f6cde;
+        }
+
+        .btn:disabled {
+            background-color: #444;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .product-card {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid #333;
+        }
+
+        .product-image {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .product-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .product-details {
+            margin-bottom: 16px;
+            color: #b0b0b0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .seo-content {
+            background-color: #2c2c2c;
+            padding: 16px;
+            border-radius: 4px;
+            margin-top: 16px;
+            border-left: 4px solid #bb86fc;
+            display: none;
+        }
+
+        .loading {
+            color: #bb86fc;
+            font-style: italic;
+        }
+
+        .error {
+            color: #ff5252;
+            background-color: rgba(255, 82, 82, 0.1);
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 82, 82, 0.3);
+        }
+
+        #status {
+            margin-bottom: 16px;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+
+        .status-message.error {
+            background: rgba(255, 82, 82, 0.1);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            color: #ff5252;
+        }
+
+        .status-message.loading {
+            background: rgba(187, 134, 252, 0.1);
+            border: 1px solid rgba(187, 134, 252, 0.3);
+            color: #bb86fc;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            resize: vertical;
+            background: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #bb86fc;
+        }
+
+        .instructions {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-container">
+            <img src="https://agmimports.com/wp-content/uploads/2020/12/AGM_Logo@2x.png" alt="AGM Imports" class="logo">
+            <div class="control-panel-title">Marketing Control Panel</div>
+        </div>
+        <nav class="nav-menu">
+            <a href="/dashboard.html" class="nav-item">
+                <span class="material-icons">dashboard</span>
+                <span class="nav-item-text">Dashboard</span>
+            </a>
+            <a href="/seo-generator.html" class="nav-item active">
+                <span class="material-icons">description</span>
+                <span class="nav-item-text">SEO Generator</span>
+            </a>
+            <a href="/video-generator.html" class="nav-item">
+                <span class="material-icons">videocam</span>
+                <span class="nav-item-text">Video Generator</span>
+            </a>
+            <a class="nav-item disabled" style="pointer-events: none; opacity: 0.5;">
+                <span class="material-icons">settings</span>
+                <span class="nav-item-text">Tool 3</span>
+            </a>
+            <a href="/credentials.html" class="nav-item">
+                <span class="material-icons">vpn_key</span>
+                <span class="nav-item-text">Credentials</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>SEO Content Generator</h1>
+            <p>Generate keyword-rich, on-brand SEO descriptions for new arrival stone products</p>
+        </div>
+
+        <div class="api-key-section">
+            <h3>OpenAI API Configuration</h3>
+            <input type="password" id="apiKey" class="api-key-input" placeholder="Enter your OpenAI API key...">
+            <button onclick="loadProducts()" class="btn" id="loadBtn">Load New Arrivals</button>
+        </div>
+
+        <div id="status"></div>
+        <div id="products" class="products-grid"></div>
+    </div>
+
+    <script>
+        let apiKey = '';
+        let products = [];
+
+        window.addEventListener('load', function() {
+            const savedApiKey = localStorage.getItem('openai_api_key');
+            if (savedApiKey) {
+                document.getElementById('apiKey').value = savedApiKey;
+                apiKey = savedApiKey;
+            }
+        });
+
+        async function loadProducts() {
+            const apiKeyInput = document.getElementById('apiKey');
+            apiKey = apiKeyInput.value.trim();
+
+            if (!apiKey) {
+                showStatus('Please enter your OpenAI API key first.', 'error');
+                return;
+            }
+
+            localStorage.setItem('openai_api_key', apiKey);
+
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.disabled = true;
+            loadBtn.textContent = 'Loading...';
+
+            try {
+                showStatus('Scraping new arrivals from AGM Imports...', 'loading');
+                const response = await fetch('/api/scrape-new-arrivals');
+                const data = await response.json();
+
+                if (data.success) {
+                    products = data.products;
+                    displayProducts(products);
+                    showStatus(`Loaded ${products.length} products successfully!`, 'success');
+                } else {
+                    showStatus(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error loading products: ${error.message}`, 'error');
+            } finally {
+                loadBtn.disabled = false;
+                loadBtn.textContent = 'Load New Arrivals';
+            }
+        }
+
+        function displayProducts(products) {
+            const productsContainer = document.getElementById('products');
+            productsContainer.innerHTML = '';
+
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.imageUrl}" alt="${product.title}" class="product-image">
+                    <div class="product-title">${product.title}</div>
+                    <div class="product-details">
+                        <strong>Material:</strong> ${product.material}<br>
+                        <strong>Color:</strong> ${product.color}<br>
+                        <strong>Lot Number:</strong> ${product.lotNumber}
+                    </div>
+                    <button onclick="generateSEO(${product.id})" class="btn" id="btn-${product.id}">
+                        Generate SEO Content
+                    </button>
+                    <div id="seo-${product.id}" class="seo-content"></div>
+                `;
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        async function generateSEO(productId) {
+            console.log('🎯 Generate SEO called for product ID:', productId);
+
+            const product = products.find(p => p.id === productId);
+            console.log('📦 Found product:', product);
+
+            const button = document.getElementById(`btn-${productId}`);
+            const seoContainer = document.getElementById(`seo-${productId}`);
+
+            if (!product) {
+                console.error('❌ Product not found for ID:', productId);
+                return;
+            }
+
+            console.log('🔑 Using API key length:', apiKey ? apiKey.length : 'NO API KEY');
+
+            button.disabled = true;
+            button.textContent = 'Generating...';
+            seoContainer.style.display = 'block';
+            seoContainer.innerHTML = '<div class="loading">Analyzing image and generating SEO content...</div>';
+
+            const requestPayload = {
+                apiKey: apiKey,
+                product: product
+            };
+            console.log('📤 Sending request payload:', requestPayload);
+
+            try {
+                console.log('📡 Making fetch request to /api/generate-seo');
+                const response = await fetch('/api/generate-seo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestPayload)
+                });
+
+                console.log('📥 Response status:', response.status, response.statusText);
+
+                const data = await response.json();
+                console.log('📋 Response data:', data);
+
+                if (data.success) {
+                    console.log('✅ SEO generation successful');
+                    console.log('📝 SEO Content length:', data.seoContent ? data.seoContent.length : 'null/undefined');
+                    console.log('📝 SEO Content preview:', data.seoContent ? data.seoContent.substring(0, 100) + '...' : 'NO CONTENT');
+
+                    const textarea = document.createElement('textarea');
+                    textarea.readOnly = true;
+                    textarea.value = data.seoContent || 'No content generated';
+
+                    seoContainer.innerHTML = '<strong style="color: #bb86fc;">Generated SEO Content:</strong>';
+                    seoContainer.appendChild(textarea);
+
+                    const instructions = document.createElement('p');
+                    instructions.className = 'instructions';
+                    instructions.textContent = 'Click in the text area above and Ctrl+A to select all, then Ctrl+C to copy';
+                    seoContainer.appendChild(instructions);
+                } else {
+                    console.error('❌ SEO generation failed:', data.error);
+                    seoContainer.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('❌ Fetch error:', error);
+                seoContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate SEO Content';
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

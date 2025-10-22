@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:agmimports.com)",
+      "Bash(npm install)",
+      "Bash(npm start)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "WebSearch",
+      "WebFetch(domain:platform.openai.com)",
+      "Bash(cmd /c:*)",
+      "Bash(node server.js)",
+      "Bash(tasklist:*)",
+      "Bash(dir:*)",
+      "WebFetch(domain:ai.google.dev)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(ffmpeg:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
