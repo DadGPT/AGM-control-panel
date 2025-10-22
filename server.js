@@ -14,6 +14,9 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
 const PORT = 7761;
 
+// ElevenLabs API Key (hardcoded)
+const ELEVENLABS_API_KEY = 'sk_278ffc46da34b5b5e7c46310afe0826ce5de8872de1104e1';
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -370,15 +373,40 @@ app.post('/api/generate-video', async (req, res) => {
   }
 });
 
+app.post('/api/generate-script', async (req, res) => {
+  try {
+    const { productDescription } = req.body;
+
+    if (!productDescription) {
+      return res.status(400).json({ success: false, error: 'Product description is required' });
+    }
+
+    console.log('📝 Generating 20-second voice script for:', productDescription);
+
+    // Use a simple script generation (you can enhance this with OpenAI if needed)
+    const script = `Discover the timeless elegance of ${productDescription.title}. This stunning ${productDescription.material} showcases ${productDescription.color} tones with exquisite natural veining. Perfect for luxury countertops, islands, and feature walls. Transform your space with natural beauty that lasts a lifetime.`;
+
+    console.log('✅ Script generated');
+
+    res.json({ success: true, script });
+  } catch (error) {
+    console.error('❌ Script generation error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to generate script'
+    });
+  }
+});
+
 app.post('/api/concatenate-videos', async (req, res) => {
   try {
-    const { videos } = req.body;
+    const { videos, productDescription } = req.body;
 
     if (!videos || videos.length !== 2) {
       return res.status(400).json({ success: false, error: 'Expected 2 video URLs' });
     }
 
-    console.log('🎬 Starting video concatenation with reverse...');
+    console.log('🎬 Starting enhanced video concatenation with audio...');
 
     const tempDir = path.join(__dirname, 'temp');
     if (!fs.existsSync(tempDir)) {
@@ -388,6 +416,7 @@ app.post('/api/concatenate-videos', async (req, res) => {
     const videoFiles = [];
     const timestamp = Date.now();
 
+    // Save video files
     for (let i = 0; i < videos.length; i++) {
       const videoData = videos[i].url.split(',')[1];
       const videoBuffer = Buffer.from(videoData, 'base64');
@@ -397,8 +426,8 @@ app.post('/api/concatenate-videos', async (req, res) => {
       console.log(`✅ Saved video ${i + 1} to ${videoPath}`);
     }
 
+    // Create reversed version of first video
     const reversedPath = path.join(tempDir, `video_${timestamp}_0_reversed.mp4`);
-
     console.log('🔄 Creating reversed version of first video...');
     await new Promise((resolve, reject) => {
       ffmpeg()
@@ -416,7 +445,8 @@ app.post('/api/concatenate-videos', async (req, res) => {
         .run();
     });
 
-    const outputPath = path.join(tempDir, `concatenated_${timestamp}.mp4`);
+    // Concatenate videos without audio first
+    const videoNoAudioPath = path.join(tempDir, `concatenated_no_audio_${timestamp}.mp4`);
     const listPath = path.join(tempDir, `concat_list_${timestamp}.txt`);
 
     const listContent = [
@@ -426,45 +456,152 @@ app.post('/api/concatenate-videos', async (req, res) => {
     ].join('\n');
     fs.writeFileSync(listPath, listContent);
 
-    console.log('📝 Created concat list file (video1 → video2 → video1 reversed)');
-
+    console.log('📝 Concatenating videos (video1 → video2 → video1 reversed)');
     await new Promise((resolve, reject) => {
       ffmpeg()
         .input(listPath)
         .inputOptions(['-f concat', '-safe 0'])
         .outputOptions(['-c copy'])
-        .output(outputPath)
+        .output(videoNoAudioPath)
         .on('end', () => {
           console.log('✅ Video concatenation complete');
           resolve();
         })
         .on('error', (err) => {
-          console.error('❌ FFmpeg error:', err);
+          console.error('❌ FFmpeg concatenation error:', err);
           reject(err);
         })
         .run();
     });
 
-    const concatenatedVideo = fs.readFileSync(outputPath);
-    const concatenatedBase64 = concatenatedVideo.toString('base64');
-    const videoUrl = `data:video/mp4;base64,${concatenatedBase64}`;
+    // Generate 20-second script
+    console.log('📝 Generating voice script...');
+    const scriptResponse = await axios.post('http://localhost:7761/api/generate-script', {
+      productDescription
+    });
+    const script = scriptResponse.data.script;
+    console.log('✅ Script generated:', script);
 
+    // Generate voice narration using ElevenLabs
+    console.log('🎙️ Generating voice narration with ElevenLabs...');
+    const voiceResponse = await axios.post(
+      'https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM',
+      {
+        text: script,
+        model_id: 'eleven_monolingual_v1',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75
+        }
+      },
+      {
+        headers: {
+          'xi-api-key': ELEVENLABS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        responseType: 'arraybuffer'
+      }
+    );
+    const voicePath = path.join(tempDir, `voice_${timestamp}.mp3`);
+    fs.writeFileSync(voicePath, voiceResponse.data);
+    console.log('✅ Voice narration generated');
+
+    // Generate background music using ElevenLabs
+    console.log('🎵 Generating background music with ElevenLabs...');
+    const musicResponse = await axios.post(
+      'https://api.elevenlabs.io/v1/sound-generation',
+      {
+        text: 'Elegant, sophisticated luxury showroom music with subtle ambient tones, gentle piano, and refined atmosphere for high-end stone and marble presentation',
+        duration_seconds: 24,
+        prompt_influence: 0.3
+      },
+      {
+        headers: {
+          'xi-api-key': ELEVENLABS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        responseType: 'arraybuffer'
+      }
+    );
+    const musicPath = path.join(tempDir, `music_${timestamp}.mp3`);
+    fs.writeFileSync(musicPath, musicResponse.data);
+    console.log('✅ Background music generated');
+
+    // Mix voice and music (reduce music volume to 30%)
+    const mixedAudioPath = path.join(tempDir, `mixed_audio_${timestamp}.mp3`);
+    console.log('🎚️ Mixing voice and music...');
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(voicePath)
+        .input(musicPath)
+        .complexFilter([
+          '[1:a]volume=0.3[music]',
+          '[0:a][music]amix=inputs=2:duration=first:dropout_transition=2[aout]'
+        ])
+        .outputOptions(['-map [aout]'])
+        .output(mixedAudioPath)
+        .on('end', () => {
+          console.log('✅ Audio mixed successfully');
+          resolve();
+        })
+        .on('error', (err) => {
+          console.error('❌ FFmpeg audio mixing error:', err);
+          reject(err);
+        })
+        .run();
+    });
+
+    // Add mixed audio to concatenated video
+    const finalOutputPath = path.join(tempDir, `final_${timestamp}.mp4`);
+    console.log('🎬 Adding audio to final video...');
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(videoNoAudioPath)
+        .input(mixedAudioPath)
+        .outputOptions([
+          '-c:v copy',
+          '-c:a aac',
+          '-shortest'
+        ])
+        .output(finalOutputPath)
+        .on('end', () => {
+          console.log('✅ Final video with audio created');
+          resolve();
+        })
+        .on('error', (err) => {
+          console.error('❌ FFmpeg final video error:', err);
+          reject(err);
+        })
+        .run();
+    });
+
+    // Read final video and convert to base64
+    const finalVideo = fs.readFileSync(finalOutputPath);
+    const finalBase64 = finalVideo.toString('base64');
+    const videoUrl = `data:video/mp4;base64,${finalBase64}`;
+
+    // Cleanup
     videoFiles.forEach(file => fs.unlinkSync(file));
     fs.unlinkSync(reversedPath);
     fs.unlinkSync(listPath);
-    fs.unlinkSync(outputPath);
+    fs.unlinkSync(videoNoAudioPath);
+    fs.unlinkSync(voicePath);
+    fs.unlinkSync(musicPath);
+    fs.unlinkSync(mixedAudioPath);
+    fs.unlinkSync(finalOutputPath);
 
     console.log('🧹 Cleaned up temporary files');
 
     res.json({
       success: true,
-      videoUrl: videoUrl
+      videoUrl: videoUrl,
+      script: script
     });
   } catch (error) {
-    console.error('❌ Concatenation error:', error);
+    console.error('❌ Enhanced video creation error:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to concatenate videos'
+      error: error.message || 'Failed to create enhanced video'
     });
   }
 });

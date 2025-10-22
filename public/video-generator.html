@@ -483,7 +483,7 @@
                     }
                 }
 
-                videoContainer.innerHTML = '<div class="loading">Concatenating videos into single clip...</div>';
+                videoContainer.innerHTML = '<div class="loading">Concatenating videos and adding AI-generated voice narration + music...</div>';
 
                 const concatResponse = await fetch('/api/concatenate-videos', {
                     method: 'POST',
@@ -491,7 +491,13 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        videos: videos
+                        videos: videos,
+                        productDescription: {
+                            title: product.title,
+                            material: product.material,
+                            color: product.color,
+                            lotNumber: product.lotNumber
+                        }
                     })
                 });
 
@@ -502,11 +508,17 @@
                 if (concatData.success) {
                     videosHtml += `
                         <div style="margin-bottom: 24px;">
-                            <strong style="color: #bb86fc; font-size: 18px;">🎬 Final Stitched Video (24 seconds - Pan → Flyby → Pan Reversed):</strong>
+                            <strong style="color: #bb86fc; font-size: 18px;">🎬 Final Video with AI Voice Narration & Music:</strong>
                             <video controls style="margin-top: 12px; border: 2px solid #bb86fc; border-radius: 8px;">
                                 <source src="${concatData.videoUrl}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
+                            ${concatData.script ? `
+                                <div style="background: #2c2c2c; padding: 12px; border-radius: 4px; margin-top: 12px; border-left: 3px solid #bb86fc;">
+                                    <strong style="color: #bb86fc;">🎙️ Voice Script:</strong>
+                                    <p style="color: #e0e0e0; margin-top: 8px; line-height: 1.6;">${concatData.script}</p>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }
